@@ -3,3 +3,33 @@ title: "p8105_hw2_cz2657"
 output: github_document
 ---
 
+## Problem 1
+
+Reading and cleaning Mr. Trash Wheel sheet
+
+```{r}
+library(tidyverse)
+library(readxl)
+```
+
+
+```{r}
+trash_df = 
+  read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "Mr. Trash Wheel", range = "A2:N408", col_names = TRUE) %>% 
+  janitor::clean_names() %>% 
+  drop_na("dumpster") 
+
+rain2018_df = read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2018 Precipitation", range = "A2:B14", col_names = TRUE) %>% mutate(year = 2018) %>% janitor::clean_names() %>% drop_na(total)
+
+rain2019_df = read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2019 Precipitation", range = "A2:B14", col_names = TRUE) %>% mutate(year = 2019) %>% janitor::clean_names() %>% drop_na(total)
+
+rain_df = left_join(rain2018_df, rain2019_df, by = "month") %>% 
+  mutate(month = month.name)
+
+median(pull(filter(trash_df, year == 2019),sports_balls))
+
+```
+
+The `trash_df` dataset has `r nrow(trash_df)` observations and includes the variables `weight_tons` and `volume_cubic_yards` which describe the amount of garbage consumed by Mr. Trash Wheel. Furthermore, it provides detail around the number of plastic bottles (`plastic_bottles`), cigarette butts (`cigarette_butts`), and grocery bags (`grocery_bags`) consumed by Mr. Trash Wheel. Excitingly, Mr. Trash Wheel powered a maximum of `r max(pull(trash_df, homes_powered), na.rm=TRUE)` using the trash collected for a single dumpster. The median number of `sports_balls` in a dumpster in 2019 was `r median(pull(filter(trash_df, year == 2019),sports_balls))`
+
+The `rain_df`
