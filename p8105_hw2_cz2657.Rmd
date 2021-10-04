@@ -23,13 +23,12 @@ rain2018_df = read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2
 
 rain2019_df = read_excel("Trash-Wheel-Collection-Totals-8-6-19.xlsx", sheet = "2019 Precipitation", range = "A2:B14", col_names = TRUE) %>% mutate(year = 2019) %>% janitor::clean_names() %>% drop_na(total)
 
-rain_df = left_join(rain2018_df, rain2019_df, by = "month") %>% 
-  mutate(month = month.name)
-
-median(pull(filter(trash_df, year == 2019),sports_balls))
+rain_df = full_join(rain2018_df, rain2019_df) %>% 
+  mutate(month = month.name[month]) %>% 
+  rename(total_precipitation_in = total)
 
 ```
 
-The `trash_df` dataset has `r nrow(trash_df)` observations and includes the variables `weight_tons` and `volume_cubic_yards` which describe the amount of garbage consumed by Mr. Trash Wheel. Furthermore, it provides detail around the number of plastic bottles (`plastic_bottles`), cigarette butts (`cigarette_butts`), and grocery bags (`grocery_bags`) consumed by Mr. Trash Wheel. Excitingly, Mr. Trash Wheel powered a maximum of `r max(pull(trash_df, homes_powered), na.rm=TRUE)` using the trash collected for a single dumpster. The median number of `sports_balls` in a dumpster in 2019 was `r median(pull(filter(trash_df, year == 2019),sports_balls))`
+The `trash_df` dataset has `r nrow(trash_df)` observations and includes the variables `weight_tons` and `volume_cubic_yards` which describe the amount of garbage consumed by Mr. Trash Wheel. Furthermore, it provides detail around the number of plastic bottles (`plastic_bottles`), cigarette butts (`cigarette_butts`), and grocery bags (`grocery_bags`) consumed by Mr. Trash Wheel. Excitingly, Mr. Trash Wheel powered a maximum of `r max(pull(trash_df, homes_powered), na.rm=TRUE)` using the trash collected for a single dumpster. The median number of `sports_balls` in a dumpster in 2019 was `r median(pull(filter(trash_df, year == 2019),sports_balls))`. 
 
-The `rain_df`
+The `rain_df`dataset has `r nrow(rain_df)` observations and includes the variables `r colnames(rain_df)`. Total precipitation in 2018 was `r sum(pull(filter(rain_df, year == 2018), total_precipitation_in))` inches. 
