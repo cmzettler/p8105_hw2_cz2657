@@ -36,12 +36,20 @@ The `rain_df`dataset has `r nrow(rain_df)` observations and includes the variabl
 ## Problem 2 
 
 ```{r}
+pols_df = read_csv("pols-month.csv") %>% 
+  separate(mon, into = c("year", "month", "day")) %>% 
+  mutate(month = month.name[as.numeric(month)], president = ifelse(prez_gop, "gop", "dem")) %>% 
+  select (-prez_dem, -prez_gop, -day)
+
+snp_df = read_csv("snp.csv") %>% 
+  mutate(date = as.Date(date,"%m/%d/%y ")) %>% 
+  separate(date, into = c("year", "month", "day")) %>% 
+  mutate(month = month.name[as.numeric(month)], day = as.numeric(day), year = as.numeric(year)) %>% 
+  select(year, month, everything())
 
 ```
 
-** figure out the president thing
 
-pols_df = read_csv("pols-month.csv") %>% 
-  separate(mon, into = c("year", "month", "day")) %>% 
-  mutate(month = month.name[month]) %>% 
-  select (-prez_dem, prez_gop, day)
+
+
+
