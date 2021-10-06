@@ -47,19 +47,29 @@ snp_df = read_csv("snp.csv") %>%
   mutate(date = as.Date(date,"%m/%d/%y ")) %>% 
   separate(date, into = c("year", "month", "day")) %>% 
   mutate(month = month.name[as.numeric(month)], day = as.numeric(day), year = as.numeric(year)) %>% 
-  select(year, month, everything())
+  select(year, month, everything(), -day) %>% 
+  rename(snp_close_value = close)
 
 unemployment_df = read_csv("unemployment.csv") %>% 
   pivot_longer(Jan:Dec, names_to = "month") %>% 
   mutate(month = match(month, month.abb), month = month.name[month]) %>% 
-  janitor::clean_names()
+  janitor::clean_names() %>% 
+  rename(percent_unemployed = value)
 
 fte_df = left_join(pols_df, snp_df, by = c("year", "month")) %>% 
   left_join(unemployment_df, by = c("year", "month"))
 
 ```
 
+## Confirm that I can delete day in snp data set 
+## Confirm that I can not round 
 
+The `prez_df` dataset provides information on the number of Republican and Democratic government officials during each month beginning in 1947, including senators (`sen_gop` and `sen_dem`), representatives (`rep_gop` and `rep_dem`), and governors (`gov_gop` and `gov_dem`), as well as the party of the `president`. It has `r ncol(pols_df)`variables and `r nrow(pols_df)` observations. 
 
+The `snp_df` dataset provides the closing value of the S&P stock index on a given date of each month in a given year. It has `r ncol(snp_df)` variables and `r nrow(snp_df)` observations. 
+
+The `unemployment_df` dataset provides information on the percentage of unemployment in a given `month` of a given `year`. It has `r ncol(unemployment_df)` variables and `r nrow(unemployment_df)` observations.
+
+Finally, the compiled dataset, `fte_df` combines this information by month and year to provide the unemployment percentage, S&P closing value, and political representation information on a monthly basis from ` r min(pull(fte_df, year))` to `r max(pull(fte_df, year))`, although some information is missing especially in earlier years. The dataset has `r nrow(fte_df)` observations and `r ncol(fte_df)` variables, including  all `president`, `percent_unemployed`, and `snp_close_value`. 
 
 
