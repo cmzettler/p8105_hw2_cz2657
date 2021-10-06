@@ -37,15 +37,25 @@ The `rain_df`dataset has `r nrow(rain_df)` observations and includes the variabl
 
 ```{r}
 pols_df = read_csv("pols-month.csv") %>% 
+  janitor::clean_names() %>% 
   separate(mon, into = c("year", "month", "day")) %>% 
-  mutate(month = month.name[as.numeric(month)], president = ifelse(prez_gop, "gop", "dem")) %>% 
+  mutate(month = month.name[as.numeric(month)], year = as.numeric(year), president = ifelse(prez_gop, "gop", "dem")) %>% 
   select (-prez_dem, -prez_gop, -day)
 
 snp_df = read_csv("snp.csv") %>% 
+  janitor::clean_names() %>% 
   mutate(date = as.Date(date,"%m/%d/%y ")) %>% 
   separate(date, into = c("year", "month", "day")) %>% 
   mutate(month = month.name[as.numeric(month)], day = as.numeric(day), year = as.numeric(year)) %>% 
   select(year, month, everything())
+
+unemployment_df = read_csv("unemployment.csv") %>% 
+  pivot_longer(Jan:Dec, names_to = "month") %>% 
+  mutate(month = match(month, month.abb), month = month.name[month]) %>% 
+  janitor::clean_names()
+
+fte_df = left_join(pols_df, snp_df, by = c("year", "month")) %>% 
+  left_join(unemployment_df, by = c("year", "month"))
 
 ```
 
